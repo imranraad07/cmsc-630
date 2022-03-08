@@ -1,39 +1,60 @@
 # importing PIL
-from PIL import Image
+import random
+
+from PIL import Image, ImageFilter
 import numpy as np
+from utils import rgb_to_gray, salt_pepper_noise
 
 
-def rgb_to_gray(img):
-    grayImage = np.zeros(img.shape)
-    R = np.array(img[:, :, 0])
-    G = np.array(img[:, :, 1])
-    B = np.array(img[:, :, 2])
+# function to obtain histogram of an image
+def hist_plot(img):
+    m, n = img.shape
+    count = []
+    r = []
+    for k in range(0, 256):
+        r.append(k)
+        count1 = 0
+        for i in range(m):
+            for j in range(n):
+                if img[i, j] == k:
+                    count1 += 1
+        count.append(count1)
+    return (r, count)
 
-    R = (R * .299)
-    G = (G * .587)
-    B = (B * .114)
 
-    Avg = (R + G + B)
-    grayImage = img.copy()
 
-    for i in range(3):
-        grayImage[:, :, i] = Avg
 
-    return grayImage
+def gaussian_noise(img_array, sigma):
+    mean = 0.0
+    noise = np.random.normal(mean, sigma, img_array.size)
+    shaped_noise = noise.reshape(img_array.shape)
+    gauss = img_array + shaped_noise
+    return gauss
 
 
 if __name__ == "__main__":
     img = Image.open('data/Cancerous cell smears/cyl01.BMP')
     # Output Images
     img.show()
-    # prints format of image
     print(img.format)
-    # prints mode of image
     print(img.mode)
 
-    img_arr = np.array(img)
-    gray_image = rgb_to_gray(img_arr)
-    print(gray_image)
+    # convert to gray image
+    gray_image = rgb_to_gray(np.array(img))
+    gray_image1 = Image.fromarray(gray_image)
+    gray_image1.show()
 
-    gray_image = Image.fromarray(gray_image)
-    gray_image.show()
+    # salt n pepper noise
+    noised_image = salt_pepper_noise(gray_image, 0.1)
+    noised_image1 = Image.fromarray(noised_image)
+    noised_image1.show()
+
+    # gaussian noise
+    noised_image_2 = gaussian_noise(gray_image, 0.1)
+    noised_image_21 = Image.fromarray(noised_image_2)
+    noised_image_21.show()
+
+    # histogram
+    r1, count = hist_plot(gray_image)
+    print(r1)
+    print(count)
