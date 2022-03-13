@@ -12,7 +12,6 @@ from joblib import Parallel, delayed
 
 def batch_process(items: list, function: Callable, batch_size: int = 10, *args, **kwargs, ) -> \
   List[Dict[str, Union[str, List[str]]]]:
-  n_workers = int(len(items) / batch_size)
   batches = [
     items[ix:ix + batch_size]
     for ix in range(0, len(items), batch_size)
@@ -25,8 +24,8 @@ def batch_process(items: list, function: Callable, batch_size: int = 10, *args, 
   try:
     progproc = Thread(target=progress_bar, args=(totals, queue))
     progproc.start()
-    result = Parallel(n_jobs=n_workers)(
-      delayed(task_wrapper)(pid, function, batch, queue, *args, **kwargs) for pid, batch in enumerate(batches))
+    result = Parallel(n_jobs=batch_size)(
+      delayed(task_wrapper)(batch_id, function, batch, queue, *args, **kwargs) for batch_id, batch in enumerate(batches))
   finally:
     queue.put('done')
     progproc.join()
@@ -36,11 +35,11 @@ def batch_process(items: list, function: Callable, batch_size: int = 10, *args, 
   return flattened
 
 
-def task_wrapper(pid, function, batch, queue, *args, **kwargs):
+def task_wrapper(batch_id, function, batch, queue, *args, **kwargs):
   result = []
   for example in batch:
     result.append(function(example, *args, **kwargs))
-    queue.put(f'update {pid}')
+    queue.put(f'update {batch_id}')
   return result
 
 
@@ -60,11 +59,11 @@ def progress_bar(totals: Union[int, List[int]], queue: Queue, ) -> None:
   while True:
     try:
       message = queue.get()
-      print(message)
+      print(message, splitted)
       if message.startswith('update'):
         if splitted:
-          pid = int(message[6:])
-          pbars[pid].update(1)
+          batch_id = int(message[6:])
+          pbars[batch_id].update(1)
         else:
           pbars[0].update(1)
       elif message == 'done':
