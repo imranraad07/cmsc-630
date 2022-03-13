@@ -6,6 +6,8 @@ import numpy as np
 from PIL import Image
 from PIL.ImageFile import ImageFile
 
+import tqdm_batch
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from utils import rgb_to_gray, salt_pepper_noise, gaussian_noise, equalized_histogram, mean_square_error, linear_filter, \
@@ -81,8 +83,8 @@ def operations(image_path):
   noised_image_2 = gaussian_noise(gray_image, 10)
   histogram_org, histogram_eq, img_eq = equalized_histogram(gray_image)
   msqe = mean_square_error(gray_image, img_eq)
-  linear_filtered_img = linear_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]), 9)
-  median_filtered_img = median_filter(gray_image, 3)
+  linear_filtered_img = linear_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]))
+  median_filtered_img = median_filter(noised_image, 3)
   t1 = time.time()
 
 
@@ -91,7 +93,7 @@ def batch_process_function(image_path):
 
 
 if __name__ == "__main__":
-  test_utils('data/Cancerous cell smears/cyl01.BMP')
+  # test_utils('data/Cancerous cell smears/cyl01.BMP')
   base_path = Path('data/Cancerous cell smears')
   files = list(base_path.glob("*.BMP"))
-  # tqdm_batch.batch_process(files, batch_process_function, n_workers=5, sep_progress=True)
+  tqdm_batch.batch_process(files, batch_process_function, n_workers=5, sep_progress=True)
