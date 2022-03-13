@@ -86,7 +86,6 @@ def save_image(name, data):
 
 def save_histogram(name, data):
   fig = plt.hist(data, bins=256, range=(0, 256))
-  # plt.title(name)
   plt.savefig(name)
   plt.close()
 
@@ -108,10 +107,12 @@ def operations(image_path, args):
   weight = np.array(args.linear_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.linear_filter_mask, args.linear_filter_mask)
-  # linear_filtered_img = linear_filter(noised_image, weight)
-  # median_filtered_img = median_filter(noised_image, 3)
+  linear_filtered_img = linear_filter(noised_image, weight)
+  save_image(args.output_path + '/' + file_name + '_linear_filtered.' + args.image_type, linear_filtered_img)
+  median_filtered_img = median_filter(noised_image, args.median_filter_mask, args.median_filter_weight)
+  save_image(args.output_path + '/' + file_name + '_median_filtered.' + args.image_type, median_filtered_img)
   t1 = time.time()
-  print(file_name, "Finished. MSQE", msqe, 'Average operation time', t1 - t0)
+  print(file_name, "Finished. MSQE", msqe, 'Operation time', t1 - t0)
 
 
 def batch_process_function(image_path, args):
@@ -128,6 +129,8 @@ if __name__ == "__main__":
   parser.add_argument('--color_channel', type=str, required=False, choices=['R', 'G', 'B'], default=None)
   parser.add_argument('--linear_filter_weights', type=str, required=False, default='1 1 1 1 1 1 1 1 1')
   parser.add_argument('--linear_filter_mask', type=int, required=False, default=3)
+  parser.add_argument('--median_filter_weight', type=int, required=False, default=1)
+  parser.add_argument('--median_filter_mask', type=int, required=False, default=3)
   parser.add_argument('--salt_pepper_noise_strength', type=float, required=False, default=0.1)
   parser.add_argument('--gaussian_strength', type=int, required=False, default=10)
 
