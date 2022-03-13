@@ -8,4 +8,5 @@ python main.py --base_path 'data/Cancerous cell smears' \
   --median_filter_weights '1 1 1 1 1 1 1 1 1' \
   --median_filter_mask 3 \
   --salt_pepper_noise_strength 0.1 \
-  --gaussian_strength 1
+  --gaussian_strength 1 \
+  --image_class_type 'cyl inter let mod para super svar'

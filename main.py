@@ -10,7 +10,8 @@ from batch_process import batch_process
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from utils import rgb_to_gray, salt_pepper_noise, gaussian_noise, equalized_histogram, mean_square_error, linear_filter, \
+from utils import rgb_to_gray, calc_avg_histogram, salt_pepper_noise, gaussian_noise, equalized_histogram, \
+  mean_square_error, linear_filter, \
   median_filter
 
 
@@ -90,7 +91,7 @@ def save_histogram(name, data):
 
 def operations(image_path, args):
   t0 = time.time()
-  file_name = image_path.stem
+  file_name = str(image_path.stem)
   img = Image.open(image_path)
   gray_image = rgb_to_gray(np.array(img), args.color_channel)
   noised_image = salt_pepper_noise(gray_image, args.salt_pepper_noise_strength)
@@ -107,18 +108,37 @@ def operations(image_path, args):
   weight = weight.reshape(args.linear_filter_mask, args.linear_filter_mask)
   linear_filtered_img = linear_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_linear_filtered.' + args.image_type, linear_filtered_img)
-
   weight = np.array(args.median_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.median_filter_mask, args.median_filter_mask)
   median_filtered_img = median_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_median_filtered.' + args.image_type, median_filtered_img)
+
+  image_classes = args.image_class_type.split()
+  image_class = 'let'
+  for name in image_classes:
+    if file_name.startswith(name):
+      image_class = name
+
   t1 = time.time()
   print(file_name, "Finished. MSQE", msqe, '. Operation time', t1 - t0)
+  return image_class, histogram_org
 
 
 def batch_process_function(image_path, args):
   return operations(image_path, args)
+
+
+def calc_avg_hist(results, output_path, image_classes):
+  for img_class in image_classes:
+    hist_list = []
+    for res in results:
+      if res[0] == img_class:
+        hist_list.append(res[1])
+    if len(hist_list) > 0:
+      avg_hist = calc_avg_histogram(hist_list)
+      name = output_path + '/avg_' + img_class + '_histogram'
+      save_histogram(name, avg_hist)
 
 
 if __name__ == "__main__":
@@ -135,10 +155,13 @@ if __name__ == "__main__":
   parser.add_argument('--median_filter_mask', type=int, required=False, default=3)
   parser.add_argument('--salt_pepper_noise_strength', type=float, required=False, default=0.1)
   parser.add_argument('--gaussian_strength', type=int, required=False, default=10)
+  parser.add_argument('--image_class_type', type=str, required=False, default='cyl inter let mod para super svar')
 
   args = parser.parse_args()
 
   base_path = Path(args.base_path)
   files = list(base_path.glob("*." + args.image_type))
+  # files = files[0:10]
   batch_size = args.batch_size
-  batch_process(files, batch_process_function, batch_size=batch_size, args=args)
+  results = batch_process(files, batch_process_function, batch_size=batch_size, args=args)
+  calc_avg_hist(results, args.output_path, args.image_class_type.split())
