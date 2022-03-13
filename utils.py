@@ -110,26 +110,19 @@ def linear_filter(img, filter):
   return out.astype(np.uint8)
 
 
-def median_filter(img, filter_size, weight):
+def median_filter(img, weight):
   copy_image = img.copy()
+  x, y = weight.shape
   m, n = copy_image.shape
-  weight = weight.tolist()
-  indexer = int(filter_size / 2)
   out = np.zeros((m, n))
   for i in range(m):
     for j in range(n):
-      pixel_list = []
-      for z in range(filter_size):
-        if i + z - indexer < 0 or i + z - indexer > m - 1:
-          for k in range(filter_size):
-            pixel_list.append(0)
-        else:
-          if j + z - indexer < 0 or j + indexer > n - 1:
-            pixel_list.append(0)
-          else:
-            for k in range(filter_size):
-              pixel_list.append((copy_image[i + z - indexer][j + k - indexer]) * weight[z][k])
-      pixel_list = np.array(pixel_list)
+      neighborhood = copy_image[i: min(i + x, m), j: min(j + y, n)]
+      if neighborhood.shape != weight.shape:
+        result = weight[0:len(neighborhood), 0:len(neighborhood[0])] * neighborhood
+      else:
+        result = weight * neighborhood
+      pixel_list = result.flatten()
       pixel_list.sort()
       out[i][j] = pixel_list[int(len(pixel_list) / 2)]
   out = np.rint(out)

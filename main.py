@@ -1,6 +1,4 @@
-# importing PIL
 import argparse
-import array
 import time
 from pathlib import Path
 from matplotlib import pyplot as plt
@@ -71,7 +69,7 @@ def test_utils(image_path):
   print("Done.")
 
   print("Median Filter...")
-  median_filtered_img = median_filter(noised_image, 3)
+  median_filtered_img = median_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]))
   median_filtered_img1 = Image.fromarray(median_filtered_img)
   median_filtered_img1.show()
   print("Done.")
@@ -112,8 +110,8 @@ def operations(image_path, args):
 
   weight = np.array(args.median_filter_weights.split())
   weight = weight.astype(int)
-  weight = weight.reshape(args.linear_filter_mask, args.linear_filter_mask)
-  median_filtered_img = median_filter(noised_image, args.median_filter_mask, weight)
+  weight = weight.reshape(args.median_filter_mask, args.median_filter_mask)
+  median_filtered_img = median_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_median_filtered.' + args.image_type, median_filtered_img)
   t1 = time.time()
   print(file_name, "Finished. MSQE", msqe, 'Operation time', t1 - t0)
