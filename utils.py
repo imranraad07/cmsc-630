@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 
@@ -17,16 +19,11 @@ def rgb_to_gray(img):
 
 
 def histogram(img):
-    m, n = img.shape
-    count = []
-    for k in range(0, 256):
-        count1 = 0
-        for i in range(m):
-            for j in range(n):
-                if img[i, j] == k:
-                    count1 += 1
-        count.append(count1)
-    return np.array(count)
+    hist = np.zeros(256)
+    for i in range(len(hist)):
+        hist[i] = np.sum(img == i)
+    hist = hist.astype(int)
+    return hist
 
 
 def gaussian_noise(img_array, sigma):
@@ -71,3 +68,8 @@ def equalized_histogram(img):
 
     img_new = np.reshape(equalized, copy_image.shape)
     return img_hist, histogram(img_new), img_new
+
+
+def mean_square_error(original_img, quantized_img):
+    mse = (np.square(original_img - quantized_img)).mean()
+    return mse
