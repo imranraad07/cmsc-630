@@ -79,7 +79,7 @@ def equalized_histogram(img):
   equalized = cum_sum[copy_image.flatten().astype(np.uint8)]
 
   img_new = np.reshape(equalized, copy_image.shape)
-  return img_hist, histogram(img_new), img_new
+  return np.array(img_hist).astype(np.uint8), np.array(histogram(img_new)).astype(np.uint8), img_new
 
 
 def mean_square_error(original_img, quantized_img):

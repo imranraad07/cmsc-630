@@ -3,6 +3,7 @@ import argparse
 import array
 import time
 from pathlib import Path
+from matplotlib import pyplot as plt
 
 import numpy as np
 from PIL import Image
@@ -83,6 +84,13 @@ def save_image(name, data):
   img.save(name)
 
 
+def save_histogram(name, data):
+  fig = plt.hist(data, bins=256, range=(0, 256))
+  # plt.title(name)
+  plt.savefig(name)
+  plt.close()
+
+
 def operations(image_path, args):
   t0 = time.time()
   file_name = image_path.stem
@@ -93,8 +101,8 @@ def operations(image_path, args):
   noised_image_2 = gaussian_noise(gray_image, args.gaussian_strength)
   save_image(args.output_path + '/' + file_name + '_gaussian.' + args.image_type, noised_image_2)
   histogram_org, histogram_eq, img_eq = equalized_histogram(gray_image)
-  save_image(args.output_path + '/' + file_name + '_histogram.' + args.image_type, histogram_org)
-  save_image(args.output_path + '/' + file_name + '_equalized_histogram.' + args.image_type, histogram_eq)
+  save_histogram(args.output_path + '/' + file_name + '_histogram.png', histogram_org)
+  save_histogram(args.output_path + '/' + file_name + '_equalized_histogram.png', histogram_eq)
   save_image(args.output_path + '/' + file_name + '_equalized.' + args.image_type, img_eq)
   msqe = mean_square_error(gray_image, img_eq)
   weight = np.array(args.linear_filter_weights.split())
