@@ -1,7 +1,6 @@
-from math import ceil
 from multiprocessing import Manager
 from threading import Thread
-from typing import List, Dict, Union, Callable
+from typing import Dict, Callable
 from typing import Union, List
 from multiprocessing import Queue
 from tqdm.auto import tqdm
@@ -17,7 +16,9 @@ def batch_process(items: list, function: Callable, batch_size: int = 10, *args, 
     for ix in range(0, len(items), batch_size)
   ]
 
-  totals = len(items)
+  # totals = len(items)
+  totals = [len(batch) for batch in batches]
+
   print('totals', totals)
   manager = Manager()
   queue = manager.Queue()
@@ -25,7 +26,8 @@ def batch_process(items: list, function: Callable, batch_size: int = 10, *args, 
     progproc = Thread(target=progress_bar, args=(totals, queue))
     progproc.start()
     result = Parallel(n_jobs=batch_size)(
-      delayed(task_wrapper)(batch_id, function, batch, queue, *args, **kwargs) for batch_id, batch in enumerate(batches))
+      delayed(task_wrapper)(batch_id, function, batch, queue, *args, **kwargs) for batch_id, batch in
+      enumerate(batches))
   finally:
     queue.put('done')
     progproc.join()
@@ -45,13 +47,11 @@ def task_wrapper(batch_id, function, batch, queue, *args, **kwargs):
 
 def progress_bar(totals: Union[int, List[int]], queue: Queue, ) -> None:
   if isinstance(totals, list):
-    splitted = True
     pbars = [
-      tqdm(desc=f'Worker {pid + 1}', total=total, position=pid, )
+      tqdm(desc=f'Batch {pid + 1}', total=total, position=pid, )
       for pid, total in enumerate(totals)
     ]
   else:
-    splitted = False
     pbars = [
       tqdm(total=totals)
     ]
@@ -59,13 +59,10 @@ def progress_bar(totals: Union[int, List[int]], queue: Queue, ) -> None:
   while True:
     try:
       message = queue.get()
-      print(message, splitted)
+      # print(message)
       if message.startswith('update'):
-        if splitted:
-          batch_id = int(message[6:])
-          pbars[batch_id].update(1)
-        else:
-          pbars[0].update(1)
+        batch_id = int(message[6:])
+        pbars[batch_id].update(1)
       elif message == 'done':
         break
     except:
