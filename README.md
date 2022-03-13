@@ -7,7 +7,6 @@ The outputs can be found here: https://drive.google.com/file/d/1tcV00SBeyuHNdiT8
 The directory includes:
 
 For each image:
-* Histogram
 * Converting to RGB/Grayscale
 * Histogram
 * Histogram equalization

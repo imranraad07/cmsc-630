@@ -94,6 +94,7 @@ def operations(image_path, args):
   file_name = str(image_path.stem)
   img = Image.open(image_path)
   gray_image = rgb_to_gray(np.array(img), args.color_channel)
+  save_image(args.output_path + '/' + file_name + '_gray_image.' + args.image_type, gray_image)
   noised_image = salt_pepper_noise(gray_image, args.salt_pepper_noise_strength)
   save_image(args.output_path + '/' + file_name + '_salt_n_pepper.' + args.image_type, noised_image)
   noised_image_2 = gaussian_noise(gray_image, args.gaussian_strength)
@@ -121,7 +122,7 @@ def operations(image_path, args):
       image_class = name
 
   t1 = time.time()
-  print(file_name, "Finished. MSQE", msqe, '. Operation time', t1 - t0)
+  print(file_name, "Finished, MSQE", msqe, ', Operation time', t1 - t0)
   return image_class, histogram_org
 
 
