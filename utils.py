@@ -87,20 +87,24 @@ def mean_square_error(original_img, quantized_img):
   return mse
 
 
-def linear_filter(img, filter, scale):
+def linear_filter(img, filter):
   copy_image = img.copy()
 
   x, y = filter.shape
-  m, n = copy_image.shape
-  m1 = m - x + 1
-  n1 = n - y + 1
-  out = np.zeros((m1, n1))
+  scale = x * y
 
-  for i in range(m1):
-    for j in range(n1):
-      neighborhood = copy_image[i: i + x, j: j + y]
-      result = np.sum(filter * neighborhood)
-      scaled_image = result / scale
+  m, n = copy_image.shape
+  out = np.zeros((m, n))
+
+  for i in range(m):
+    for j in range(n):
+      neighborhood = copy_image[i: min(i + x, m), j: min(j + y, n)]
+      if neighborhood.shape != filter.shape:
+        result = np.sum(filter[0:len(neighborhood), 0:len(neighborhood[0])] * neighborhood)
+        scaled_image = result / scale
+      else:
+        result = np.sum(filter * neighborhood)
+        scaled_image = result / scale
       out[i, j] = scaled_image
   out = np.rint(out)
   return out.astype(np.uint8)
@@ -111,22 +115,22 @@ def median_filter(img, filter_size):
 
   m, n = copy_image.shape
   out = np.zeros((m, n))
-  indexer = filter_size // 2
+  indexer = filter_size / 2
 
   for i in range(m):
     for j in range(n):
       pixel_list = []
       for z in range(filter_size):
-        if i + z - indexer < 0 or i + z - indexer > len(copy_image) - 1:
+        if i + z - indexer < 0 or i + z - indexer > m - 1:
           for c in range(filter_size):
             pixel_list.append(0)
         else:
-          if j + z - indexer < 0 or j + indexer > len(copy_image[0]) - 1:
+          if j + z - indexer < 0 or j + indexer > n - 1:
             pixel_list.append(0)
           else:
             for k in range(filter_size):
               pixel_list.append(copy_image[i + z - indexer][j + k - indexer])
       pixel_list.sort()
-      out[i][j] = pixel_list[len(pixel_list) // 2]
+      out[i][j] = pixel_list[len(pixel_list) / 2]
   out = np.rint(out)
   return out

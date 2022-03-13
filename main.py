@@ -61,7 +61,7 @@ def test_utils(image_path):
   print("Done.")
 
   print("Linear Filter...")
-  linear_filtered_img = linear_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]), 9)
+  linear_filtered_img = linear_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]))
   linear_filtered_img1 = Image.fromarray(linear_filtered_img)
   linear_filtered_img1.show()
   print("Done.")
@@ -81,7 +81,7 @@ def operations(image_path):
   noised_image_2 = gaussian_noise(gray_image, 10)
   histogram_org, histogram_eq, img_eq = equalized_histogram(gray_image)
   msqe = mean_square_error(gray_image, img_eq)
-  linear_filtered_img = linear_filter(gray_image, np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]]), 9)
+  linear_filtered_img = linear_filter(noised_image, np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]), 9)
   median_filtered_img = median_filter(gray_image, 3)
   t1 = time.time()
 
