@@ -114,7 +114,7 @@ def operations(image_path, args):
   median_filtered_img = median_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_median_filtered.' + args.image_type, median_filtered_img)
   t1 = time.time()
-  print(file_name, "Finished. MSQE", msqe, 'Operation time', t1 - t0)
+  print(file_name, "Finished. MSQE", msqe, '. Operation time', t1 - t0)
 
 
 def batch_process_function(image_path, args):
