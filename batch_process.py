@@ -19,7 +19,7 @@ def batch_process(items: list, function: Callable, batch_size: int = 10, *args, 
   # totals = len(items)
   totals = [len(batch) for batch in batches]
 
-  print('totals', totals)
+  # print('totals', totals)
   manager = Manager()
   queue = manager.Queue()
   try:

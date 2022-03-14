@@ -95,38 +95,66 @@ def save_histogram(name, data):
 
 
 def operations(image_path, args):
+  time_calculation = ""
   t0 = time.time()
   file_name = str(image_path.stem)
   img = Image.open(image_path)
+  t2 = time.time()
   gray_image = rgb_to_gray(np.array(img), args.color_channel)
   save_image(args.output_path + '/' + file_name + '_gray_image.' + args.image_type, gray_image)
+  t3 = time.time()
+  time_calculation = str(int(t3 - t2)) + ","
+
+  t2 = time.time()
   noised_image = salt_pepper_noise(gray_image, args.salt_pepper_noise_strength)
   save_image(args.output_path + '/' + file_name + '_salt_n_pepper.' + args.image_type, noised_image)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
+
+  t2 = time.time()
   noised_image_2 = gaussian_noise(gray_image, args.gaussian_strength)
   save_image(args.output_path + '/' + file_name + '_gaussian.' + args.image_type, noised_image_2)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
+
+  t2 = time.time()
   histogram_org, histogram_eq, img_eq = equalized_histogram(gray_image)
   save_histogram(args.output_path + '/' + file_name + '_histogram.png', histogram_org)
   save_histogram(args.output_path + '/' + file_name + '_equalized_histogram.png', histogram_eq)
   save_image(args.output_path + '/' + file_name + '_equalized.' + args.image_type, img_eq)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
 
+  t2 = time.time()
   thresholds = args.quantization_thresholds.split()
   thresholds = list(map(int, thresholds))
   img_quant = image_quantization(gray_image, thresholds)
   save_image(args.output_path + '/' + file_name + '_quantized.' + args.image_type, img_eq)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
 
+  t2 = time.time()
   msqe = mean_square_error(gray_image, img_quant)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
 
+  t2 = time.time()
   weight = np.array(args.linear_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.linear_filter_mask, args.linear_filter_mask)
   linear_filtered_img = linear_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_linear_filtered.' + args.image_type, linear_filtered_img)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
 
+  t2 = time.time()
   weight = np.array(args.median_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.median_filter_mask, args.median_filter_mask)
   median_filtered_img = median_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_median_filtered.' + args.image_type, median_filtered_img)
+  t3 = time.time()
+  time_calculation = time_calculation + str(int(t3 - t2)) + ","
 
   image_classes = args.image_class_type.split()
   image_class = 'let'
@@ -135,7 +163,9 @@ def operations(image_path, args):
       image_class = name
 
   t1 = time.time()
-  print(file_name, "Finished, MSQE", msqe, ', Operation time', t1 - t0)
+
+  time_calculation = time_calculation + str(int(t1 - t0)) + ","
+  print(time_calculation)
   return image_class, histogram_org
 
 
@@ -173,6 +203,8 @@ if __name__ == "__main__":
   parser.add_argument('--quantization_thresholds', type=str, required=False, default='10 30 60 120 180')
 
   args = parser.parse_args()
+  header = "gray conversion, salt and pepper, guassian, histogram and equalized Histogram, quantization, msqe, linear filter, median filter, total operation time"
+  print(header)
 
   base_path = Path(args.base_path)
   files = list(base_path.glob("*." + args.image_type))
