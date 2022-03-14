@@ -10,10 +10,10 @@ For each image:
 * Converting to RGB/Grayscale
 * Histogram
 * Histogram equalization
-* Linear filtered image
-* Median filtered image
 * Salt and pepper noise
 * Gaussian noise
+* Linear filtered image (On the output image after applying salt and pepper noise)
+* Median filtered image (On the output image after applying Gaussian noise)
 
 For each image class:
 * Averaged histograms
