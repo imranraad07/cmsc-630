@@ -10,9 +10,8 @@ from batch_process import batch_process
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from utils import rgb_to_gray, calc_avg_histogram, salt_pepper_noise, gaussian_noise, equalized_histogram, \
-  mean_square_error, linear_filter, \
-  median_filter
+from utils import rgb_to_gray, calc_avg_histogram, salt_pepper_noise, gaussian_noise, image_quantization, \
+  equalized_histogram, mean_square_error, linear_filter, median_filter
 
 
 def test_utils(image_path):
@@ -56,6 +55,12 @@ def test_utils(image_path):
   img_eq1.show()
   # print(histogram_org)
   # print(histogram_eq)
+  print("Done.")
+
+  print("Quantization...")
+  img_quant = image_quantization(gray_image, [0, 5, 10, 30, 50, 90, 200])
+  img_quant1 = Image.fromarray(img_quant)
+  img_quant1.show()
   print("Done.")
 
   print("MSQE...")
@@ -103,12 +108,20 @@ def operations(image_path, args):
   save_histogram(args.output_path + '/' + file_name + '_histogram.png', histogram_org)
   save_histogram(args.output_path + '/' + file_name + '_equalized_histogram.png', histogram_eq)
   save_image(args.output_path + '/' + file_name + '_equalized.' + args.image_type, img_eq)
-  msqe = mean_square_error(gray_image, img_eq)
+
+  thresholds = args.quantization_thresholds.split()
+  thresholds = list(map(int, thresholds))
+  img_quant = image_quantization(gray_image, thresholds)
+  save_image(args.output_path + '/' + file_name + '_quantized.' + args.image_type, img_eq)
+
+  msqe = mean_square_error(gray_image, img_quant)
+
   weight = np.array(args.linear_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.linear_filter_mask, args.linear_filter_mask)
   linear_filtered_img = linear_filter(noised_image, weight)
   save_image(args.output_path + '/' + file_name + '_linear_filtered.' + args.image_type, linear_filtered_img)
+
   weight = np.array(args.median_filter_weights.split())
   weight = weight.astype(int)
   weight = weight.reshape(args.median_filter_mask, args.median_filter_mask)
@@ -157,12 +170,12 @@ if __name__ == "__main__":
   parser.add_argument('--salt_pepper_noise_strength', type=float, required=False, default=0.1)
   parser.add_argument('--gaussian_strength', type=int, required=False, default=10)
   parser.add_argument('--image_class_type', type=str, required=False, default='cyl inter let mod para super svar')
+  parser.add_argument('--quantization_thresholds', type=str, required=False, default='10 30 60 120 180')
 
   args = parser.parse_args()
 
   base_path = Path(args.base_path)
   files = list(base_path.glob("*." + args.image_type))
-  # files = files[0:10]
   batch_size = args.batch_size
   results = batch_process(files, batch_process_function, batch_size=batch_size, args=args)
   calc_avg_hist(results, args.output_path, args.image_class_type.split())

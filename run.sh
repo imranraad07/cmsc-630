@@ -3,6 +3,7 @@ python main.py --base_path 'data/Cancerous cell smears' \
   --image_type 'BMP' \
   --batch_size 10 \
   --color_channel 'R' \
+  --quantization_thresholds '10 30 60 120 180' \
   --linear_filter_weights '1 1 1 1 1 1 1 1 1' \
   --linear_filter_mask 3 \
   --median_filter_weights '1 1 1 1 1 1 1 1 1' \

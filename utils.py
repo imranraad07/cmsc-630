@@ -82,6 +82,31 @@ def equalized_histogram(img):
   return np.array(img_hist).astype(np.uint8), np.array(histogram(img_new)).astype(np.uint8), img_new
 
 
+def image_quantization(img, thresholds):
+  copy_image = img.copy()
+
+  if thresholds[0] != 0:
+    thresholds.insert(0, 0)
+  if thresholds[len(thresholds) - 1] != 256:
+    thresholds.append(256)
+    
+  thresholds = np.array(thresholds)
+
+  r = np.zeros(len(thresholds) - 1)
+  for i in range(len(r)):
+    r[i] = (thresholds[i] + thresholds[i + 1]) / 2
+  Q = np.zeros(256)
+  p = np.array(range(256))
+  for i in range(len(thresholds) - 1):
+    Q = Q + r[i] * ((p >= thresholds[i]) & (p < thresholds[i + 1]))
+
+  img_new = Q[copy_image]
+
+  img_new = np.rint(img_new)
+  img_new = img_new.astype(np.uint8)
+  return img_new
+
+
 def mean_square_error(original_img, quantized_img):
   mse = (np.square(original_img - quantized_img)).mean()
   return mse
