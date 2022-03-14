@@ -165,7 +165,7 @@ def operations(image_path, args):
   t1 = time.time()
 
   time_calculation = time_calculation + str(int(t1 - t0)) + ","
-  print(time_calculation)
+  print(time_calculation, msqe)
   return image_class, histogram_org
 
 
@@ -203,7 +203,7 @@ if __name__ == "__main__":
   parser.add_argument('--quantization_thresholds', type=str, required=False, default='10 30 60 120 180')
 
   args = parser.parse_args()
-  header = "gray conversion, salt and pepper, guassian, histogram and equalized Histogram, quantization, msqe, linear filter, median filter, total operation time"
+  header = "gray conversion, salt and pepper, guassian, histogram and equalized Histogram, quantization, msqe, linear filter, median filter, total operation time, msqe"
   print(header)
 
   base_path = Path(args.base_path)
