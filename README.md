@@ -10,6 +10,7 @@ For each image:
 * Converting to RGB/Grayscale
 * Histogram
 * Histogram equalization
+* Quantized image
 * Salt and pepper noise
 * Gaussian noise
 * Linear filtered image (On the output image after applying salt and pepper noise)
