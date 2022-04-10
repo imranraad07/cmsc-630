@@ -21,11 +21,11 @@ def erode_image(gray_image, erosion_level=3):
     pad_width = erosion_level - 2
 
     image_pad = np.pad(array=image_src, pad_width=pad_width, mode='constant')
-    pimg_shape = image_pad.shape
-    h, w = (pimg_shape[0] - orig_shape[0]), (pimg_shape[1] - orig_shape[1])
+    temp_shape = image_pad.shape
+    h, w = (temp_shape[0] - orig_shape[0]), (temp_shape[1] - orig_shape[1])
 
-    flat = np.array([image_pad[i:(i + erosion_level), j:(j + erosion_level)] for i in range(pimg_shape[0] - h) for j in
-                     range(pimg_shape[1] - w)])
+    flat = np.array([image_pad[i:(i + erosion_level), j:(j + erosion_level)] for i in range(temp_shape[0] - h) for j in
+                     range(temp_shape[1] - w)])
 
     out = np.array([255 if (i == kernel).all() else 0 for i in flat])
     out = out.reshape(orig_shape)
