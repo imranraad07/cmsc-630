@@ -1,6 +1,19 @@
 # cmsc-630
 
-# Output:
+# Part 2
+The outputs can be found here: https://drive.google.com/file/d/1h6SEr7DAYG2fhPsNZehrI8fc0Vwd7YCl/view?usp=sharing
+
+The directory includes:
+For each image:
+* Edge detection (Edge filter can be changed from run.h)
+* Dilated image
+* Eroded image
+* Image after histogram thresholding
+* Image after kmeans clustering (k can be changed from run.sh)
+
+
+# Part 1
+## Output:
 
 The outputs can be found here: https://drive.google.com/file/d/1tcV00SBeyuHNdiT8-YuYh82sU1zCRcnH/view?usp=sharing
 
@@ -20,7 +33,7 @@ For each image:
 For each image class:
 * Averaged histograms
 
-# How to run:
+## How to run:
 
 The project runs in python 3.6. Required libraries are included in requirements.txt. To run the project:
 * Setup virtual env
