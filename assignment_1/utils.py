@@ -16,12 +16,9 @@ def rgb_to_gray(img, color_spectrum=None):
         Avg = (R + G + B)
         return Avg
     if color_spectrum == 'R':
-        R = R.astype(np.uint8)
         return R
     elif color_spectrum == 'G':
-        G = G.astype(np.uint8)
         return G
-    B = B.astype(np.uint8)
     return B
 
 
