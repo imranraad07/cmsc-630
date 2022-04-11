@@ -29,7 +29,7 @@ def operations(image_path, args):
     t0 = time.time()
     file_name = str(image_path.stem)
     img = Image.open(image_path)
-    gray_image = rgb_to_gray(np.array(img), 'R')
+    gray_image = rgb_to_gray(np.array(img), 'G')
 
     filter = np.array(args.edge_filter_operator.split())
     filter = filter.astype(int)
