@@ -73,13 +73,13 @@ def kmeans_clusters(gray_image, k, max_iteration=100):
 # image_path = 'data/Cancerous cell smears/para11.BMP'
 # img = Image.open(image_path)
 # gray_image = rgb_to_gray(np.array(img), 'R')
-# segmented = kmeans_clusters(gray_image, 2)
-# # segmented = kmeans_clusters(gray_image, 3)
+# # segmented = kmeans_clusters(gray_image, 2)
+# segmented = kmeans_clusters(gray_image, 3)
 # # segmented = kmeans_clusters(gray_image, 4)
 # # segmented = kmeans_clusters(gray_image, 5)
 # segmented_1 = Image.fromarray(segmented.astype(np.uint8))
 # segmented_1.show()
-
+#
 # from sklearn.cluster import KMeans
 #
 # image_path = 'data/Cancerous cell smears/para11.BMP'

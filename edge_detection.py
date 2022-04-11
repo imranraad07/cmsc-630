@@ -130,15 +130,35 @@ def sobel_edge_detection(image, edge_filter):
     return gradient_magnitude, gradient_direction
 
 
+def normalize(x, mu, sd):
+    return 1 / (np.sqrt(2 * np.pi) * sd) * np.e ** (-np.power((x - mu) / sd, 2) / 2)
+
+
+def gaussian_kernel(size, sigma=1):
+    kernel_1D = np.linspace(- int(size / 2), int(size / 2), size)
+    for i in range(size):
+        kernel_1D[i] = normalize(kernel_1D[i], 0, sigma)
+    kernel_2D = np.outer(kernel_1D.T, kernel_1D.T)
+
+    kernel_2D *= 1.0 / kernel_2D.max()
+
+    return kernel_2D
+
+
+def gaussian_blur(image, kernel_size):
+    kernel = gaussian_kernel(kernel_size, sigma=math.sqrt(kernel_size))
+    return convolution(image, kernel, average=True)
+
+
 def edge_detect(gray_image, edge_filter):
     copy_image = gray_image.copy()
-    gradient_magnitude, gradient_direction = sobel_edge_detection(copy_image, edge_filter)
+    gaussian_blurred_image = gaussian_blur(copy_image, len(edge_filter) * len(edge_filter[0]))
+    gradient_magnitude, gradient_direction = sobel_edge_detection(gaussian_blurred_image, edge_filter)
     out = non_max_suppression(gradient_magnitude, gradient_direction)
     out = threshold(out, 5, 20, 100)
     out = hysteresis(out, 100)
     out = out.astype(np.uint8)
     return out
-
 
 # image_path = 'data/Cancerous cell smears/para11.BMP'
 #
