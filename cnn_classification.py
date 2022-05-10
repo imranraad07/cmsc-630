@@ -187,8 +187,8 @@ for X, Y in data_loader:
                     predicted.append(k)
                     break
 
-    cost.backward()
-    optimizer.step()
+    # cost.backward()
+    # optimizer.step()
 
 test_y = np.array(test_y)
 predicted = np.array(predicted)

@@ -6,19 +6,21 @@ import torchvision.transforms as transforms
 import torch.nn.init
 from PIL import Image
 import torch.nn.functional as F
+from sklearn.metrics import roc_curve
+import matplotlib.pyplot as plt
 
 # parameters
 from sklearn import metrics
 
-learning_rate = 0.01
-training_epochs = 30
+learning_rate = 0.001
+training_epochs = 300
 batch_size = 50
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 import os
 
-data_dir = 'dnn_data'
+data_dir = 'data/Cancerous cell smears'
 data_files = os.listdir(data_dir)
 
 
@@ -70,7 +72,7 @@ data_transform = transforms.Compose([
 
 input_size = 3 * 256 * 256
 output_size = 7
-hidden_size = [512, 1024, 256]
+hidden_size = [512, 256, 64]
 
 
 class DNN(torch.nn.Module):
@@ -98,9 +100,11 @@ fold_results = []
 precision = []
 recall = []
 f1 = []
+idx = 0
 
 for item in data_10fold:
     # print(len(item[0]), len(item[1]))
+    idx = idx + 1
 
     train_files = item[0]
     test_files = item[1]
@@ -125,7 +129,7 @@ for item in data_10fold:
     data_loader = torch.utils.data.DataLoader(dataset=cells, batch_size=batch_size, shuffle=True, drop_last=True)
     model = DNN().to(device)
 
-    print(model)
+    # print(model)
 
     # define cost/loss & optimizer
     criterion = torch.nn.CrossEntropyLoss().to(device)  # Softmax is internally computed.
@@ -133,7 +137,7 @@ for item in data_10fold:
 
     # train my model
     total_batch = len(data_loader)
-    print('Learning started. It takes sometime.')
+    # print('Learning started. It takes sometime.')
     for epoch in range(training_epochs):
         avg_cost = 0
 
@@ -151,7 +155,7 @@ for item in data_10fold:
 
         print('[Epoch: {:>4}] cost = {:>.9}'.format(epoch + 1, avg_cost))
 
-    print('Learning Finished!')
+    # print('Learning Finished!')
 
     cyl_files = [tf for tf in test_files if 'cyl' in tf]
     inter_files = [tf for tf in test_files if 'inter' in tf]
@@ -182,43 +186,38 @@ for item in data_10fold:
     for X, Y in data_loader:
         X = X.to(device)
         Y = Y.to(device)
-        print(len(X), len(Y))
+        # print(len(X), len(Y))
         optimizer.zero_grad()
         hypothesis = model(X)
         cost = criterion(hypothesis, Y)
+
         y_true = Y.cpu().detach().numpy()
+        _, results = torch.max(hypothesis.data, 1)
+        print(results)
 
-        for i in range(batch_size):
-            test_y.append(y_true[i])
-            if np.array(hypothesis[i].cpu().detach().numpy())[Y[i].cpu().detach().numpy()] == np.max(
-                np.array(hypothesis[i].cpu().detach().numpy())):
-                predicted.append(y_true[i])
-            else:
-                for k in range(len(np.array(hypothesis[i].cpu().detach().numpy()))):
-                    tmp = np.array(hypothesis[i].cpu().detach().numpy())
-                    if tmp[k] == np.max(tmp):
-                        predicted.append(k)
-                        break
-
-        # cost.backward()
-        # optimizer.step()
+        test_y.extend(y_true)
+        predicted.extend(results.cpu().detach())
 
     test_y = np.array(test_y)
     predicted = np.array(predicted)
-    print(test_y)
-    print(predicted)
 
-    print("Precision:", round(metrics.precision_score(test_y, predicted, average="micro"), 3),
-          "Recall:", round(metrics.recall_score(test_y, predicted, average="micro"), 3),
-          "F1-score:", round(metrics.f1_score(test_y, predicted, average="micro"), 3))
-    res = str(round(metrics.precision_score(test_y, predicted, average="micro"), 2)) + " & " + str(
-        round(metrics.precision_score(test_y, predicted, average="micro"), 2)) + " & " + str(
-        round(metrics.precision_score(test_y, predicted, average="micro"), 2))
+    for u in range(7):
+        fpr, tpr, thresholds = metrics.roc_curve(test_y, predicted, pos_label=u)
+        print("auc at " + str(u), metrics.auc(fpr, tpr))
+
+    # print("Precision:", round(metrics.precision_score(test_y, predicted, average="micro"), 3),
+    #       "Recall:", round(metrics.recall_score(test_y, predicted, average="micro"), 3),
+    #       "F1-score:", round(metrics.f1_score(test_y, predicted, average="micro"), 3))
+    res = str(idx) + " & " + str(round(metrics.precision_score(test_y, predicted, average="micro"), 2)) + " & " + \
+          str(round(metrics.precision_score(test_y, predicted, average="micro"), 2)) + " & " + \
+          str(round(metrics.precision_score(test_y, predicted, average="micro"), 2))
     fold_results.append(res)
-    precision.append(round(metrics.precision_score(test_y, predicted, average="micro"), 3))
-    recall.append(round(metrics.recall_score(test_y, predicted, average="micro"), 3))
-    f1.append(round(metrics.f1_score(test_y, predicted, average="micro"), 3))
+    precision.append(round(metrics.precision_score(test_y, predicted, average="micro"), 2))
+    recall.append(round(metrics.recall_score(test_y, predicted, average="micro"), 2))
+    f1.append(round(metrics.f1_score(test_y, predicted, average="micro"), 2))
 
 print("Precision:", np.average(np.array(precision)), "Recall:", np.average(np.array(recall)), "F1-score:",
       np.average(np.array(f1)))
-print(fold_results)
+
+for res in fold_results:
+    print(res)

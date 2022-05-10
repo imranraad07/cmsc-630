@@ -19,7 +19,6 @@ with open('features_organized.tsv') as csv_file:
             classes[row[13]] = len(classes.keys()) + 1
         data_pair.append((features, classes[row[13]]))
 
-print(classes)
 
 
 def kNN(x, x_train, y_train, k=5):
@@ -52,6 +51,9 @@ data_10fold = prepare_10fold(data_pair)
 precision = []
 recall = []
 f1 = []
+
+auc = [0, 0, 0, 0, 0, 0, 0]
+
 for item in data_10fold:
     X = []
     y = []
@@ -73,14 +75,26 @@ for item in data_10fold:
 
     predicted = kNN(X_test, X, y, k=1)
     # print(predicted)
+
+    for u in range(7):
+        fpr, tpr, thresholds = metrics.roc_curve(y_test, predicted, pos_label=u + 1)
+        print("auc at " + str(u + 1), round(metrics.auc(fpr, tpr), 2))
+        auc[u] += round(metrics.auc(fpr, tpr), 2)
+
     print(metrics.classification_report(y_test, predicted))
-    print("Precision:", round(metrics.precision_score(y_test, predicted, average="micro"), 3),
-          "Recall:", round(metrics.recall_score(y_test, predicted, average="micro"), 3),
-          "F1-score:", round(metrics.f1_score(y_test, predicted, average="micro"), 3))
+    print("Precision:", round(metrics.precision_score(y_test, predicted, average="micro"), 2),
+          "Recall:", round(metrics.recall_score(y_test, predicted, average="micro"), 2),
+          "F1-score:", round(metrics.f1_score(y_test, predicted, average="micro"), 2))
 
-    precision.append(round(metrics.precision_score(y_test, predicted, average="micro"), 3))
-    recall.append(round(metrics.recall_score(y_test, predicted, average="micro"), 3))
-    f1.append(round(metrics.f1_score(y_test, predicted, average="micro"), 3))
+    precision.append(round(metrics.precision_score(y_test, predicted, average="micro"), 2))
+    recall.append(round(metrics.recall_score(y_test, predicted, average="micro"), 2))
+    f1.append(round(metrics.f1_score(y_test, predicted, average="micro"), 2))
 
-print("Precision:", np.average(np.array(precision)), "Recall:", np.average(np.array(recall)), "F1-score:",
-      np.average(np.array(f1)))
+print(classes)
+auc = np.array(auc)
+print( auc / 10)
+
+print("TOTAL", "Precision:", round(np.average(np.array(precision)), 2), "Recall:",
+      round(np.average(np.array(recall)), 2),
+      "F1-score:",
+      round(np.average(np.array(f1)), 2))
