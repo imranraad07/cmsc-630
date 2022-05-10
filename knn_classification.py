@@ -8,6 +8,13 @@ from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier
 
 classes = {}
+classes['cyl'] = 1
+classes['inter'] = 2
+classes['mod'] = 3
+classes['let'] = 4
+classes['super'] = 5
+classes['para'] = 6
+classes['svar'] = 7
 data_pair = []
 with open('features_organized.tsv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -18,7 +25,6 @@ with open('features_organized.tsv') as csv_file:
         if row[13] not in classes.keys():
             classes[row[13]] = len(classes.keys()) + 1
         data_pair.append((features, classes[row[13]]))
-
 
 
 def kNN(x, x_train, y_train, k=5):
@@ -53,6 +59,7 @@ recall = []
 f1 = []
 
 auc = [0, 0, 0, 0, 0, 0, 0]
+auc_str = ['', '', '', '', '', '', '']
 
 for item in data_10fold:
     X = []
@@ -80,8 +87,9 @@ for item in data_10fold:
         fpr, tpr, thresholds = metrics.roc_curve(y_test, predicted, pos_label=u + 1)
         print("auc at " + str(u + 1), round(metrics.auc(fpr, tpr), 2))
         auc[u] += round(metrics.auc(fpr, tpr), 2)
+        auc_str[u] = auc_str[u] + " & " + str(round(metrics.auc(fpr, tpr), 2))
 
-    print(metrics.classification_report(y_test, predicted))
+    # print(metrics.classification_report(y_test, predicted))
     print("Precision:", round(metrics.precision_score(y_test, predicted, average="micro"), 2),
           "Recall:", round(metrics.recall_score(y_test, predicted, average="micro"), 2),
           "F1-score:", round(metrics.f1_score(y_test, predicted, average="micro"), 2))
@@ -92,7 +100,10 @@ for item in data_10fold:
 
 print(classes)
 auc = np.array(auc)
-print( auc / 10)
+print(auc / 10)
+
+for s in auc_str:
+    print(s)
 
 print("TOTAL", "Precision:", round(np.average(np.array(precision)), 2), "Recall:",
       round(np.average(np.array(recall)), 2),

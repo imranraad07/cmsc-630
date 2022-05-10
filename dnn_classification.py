@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # parameters
 from sklearn import metrics
 
-learning_rate = 0.001
+learning_rate = 0.0001
 training_epochs = 300
 batch_size = 50
 
@@ -101,6 +101,8 @@ precision = []
 recall = []
 f1 = []
 idx = 0
+auc = [0, 0, 0, 0, 0, 0, 0]
+auc_str = ['', '', '', '', '', '', '']
 
 for item in data_10fold:
     # print(len(item[0]), len(item[1]))
@@ -204,6 +206,8 @@ for item in data_10fold:
     for u in range(7):
         fpr, tpr, thresholds = metrics.roc_curve(test_y, predicted, pos_label=u)
         print("auc at " + str(u), metrics.auc(fpr, tpr))
+        auc[u] += round(metrics.auc(fpr, tpr), 2)
+        auc_str[u] = auc_str[u] + " & " + str(round(metrics.auc(fpr, tpr), 2))
 
     # print("Precision:", round(metrics.precision_score(test_y, predicted, average="micro"), 3),
     #       "Recall:", round(metrics.recall_score(test_y, predicted, average="micro"), 3),
@@ -215,6 +219,13 @@ for item in data_10fold:
     precision.append(round(metrics.precision_score(test_y, predicted, average="micro"), 2))
     recall.append(round(metrics.recall_score(test_y, predicted, average="micro"), 2))
     f1.append(round(metrics.f1_score(test_y, predicted, average="micro"), 2))
+
+auc = np.array(auc)
+print(auc / 10)
+
+for s in auc_str:
+    print(s)
+
 
 print("Precision:", np.average(np.array(precision)), "Recall:", np.average(np.array(recall)), "F1-score:",
       np.average(np.array(f1)))
