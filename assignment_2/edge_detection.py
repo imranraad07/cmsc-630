@@ -160,3 +160,11 @@ def edge_detect(gray_image, edge_filter):
     out = out.astype(np.uint8)
     return out
 
+# image_path = 'data/Cancerous cell smears/para11.BMP'
+#
+# img = Image.open(image_path)
+# gray_image = rgb_to_gray(np.array(img), 'R')
+# gray_image = gray_image.astype(np.uint8)
+# edge_image = edge_detect(gray_image, np.array([[-3, 0, 3], [-10, 0, 10], [-3, 0, 3]]))
+# edge_image1 = Image.fromarray(edge_image.astype(np.uint8))
+# edge_image1.show()

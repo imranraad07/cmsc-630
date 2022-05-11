@@ -221,10 +221,6 @@ for item in data_10fold:
         out_res = "auc at " + str(u) + " " + str(metrics.auc(fpr, tpr))
         print(out_res)
 
-    f = open("auc_fold.txt", "a")
-    f.write(out_res)
-    f.close()
-
     # print("Precision:", round(metrics.precision_score(test_y, predicted, average="micro"), 3),
     #       "Recall:", round(metrics.recall_score(test_y, predicted, average="micro"), 3),
     #       "F1-score:", round(metrics.f1_score(test_y, predicted, average="micro"), 3))
@@ -238,9 +234,3 @@ for item in data_10fold:
 
 print("Precision:", np.average(np.array(precision)), "Recall:", np.average(np.array(recall)), "F1-score:",
       np.average(np.array(f1)))
-
-for res in fold_results:
-    print(res)
-    f = open("auc_fold.txt", "a")
-    f.write(res)
-    f.close()

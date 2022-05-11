@@ -47,3 +47,11 @@ def histogram_thresholding(gray_image):
     copy_image[copy_image < pivot] = 0
     out = copy_image.astype(np.uint8)
     return out.reshape(gray_image.shape)
+
+# image_path = 'data/Cancerous cell smears/cyl01.BMP'
+# img = Image.open(image_path)
+# gray_image = rgb_to_gray(np.array(img), 'R')
+# gray_image = gray_image.astype(np.uint8)
+# segmented_thresholding = histogram_thresholding(gray_image)
+# segmented_thresholding1 = Image.fromarray(segmented_thresholding.astype(np.uint8))
+# segmented_thresholding1.show()

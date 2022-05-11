@@ -39,3 +39,20 @@ def dilate_image(gray_image):
     eroded_inverse = erode_image(inverted_img, 3).astype(np.uint8)
     out = np.invert(eroded_inverse)
     return out
+
+
+# image_path = 'data/Cancerous cell smears/para11.BMP'
+#
+# img = Image.open(image_path)
+# gray_image = rgb_to_gray(np.array(img), 'R')
+# gray_image = gray_image.astype(np.uint8)
+#
+# eroded_image = erode_image(gray_image)
+# eroded_image1 = Image.fromarray(eroded_image.astype(np.uint8))
+# eroded_image1.show()
+#
+# inverted_img = np.invert(gray_image)
+# eroded_inverse = erode_image(inverted_img, 3).astype(np.uint8)
+# dilated_image = np.invert(eroded_inverse)
+# dilated_image1 = Image.fromarray(dilated_image.astype(np.uint8))
+# dilated_image1.show()
