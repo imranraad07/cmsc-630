@@ -4,11 +4,11 @@
 
 Running commands:
 
-kNN: `python knn_classification.py'
+kNN: `python knn_classification.py`
 
-DNN: `python dnn_classification.py'
+DNN: `python dnn_classification.py`
 
-CNN: `python cnn_classification.py'
+CNN: `python cnn_classification.py`
 
 
 # Part 2
