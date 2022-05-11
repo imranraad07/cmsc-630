@@ -1,5 +1,16 @@
 # cmsc-630
 
+# Part 3
+
+Running commands:
+
+kNN: `python knn_classification.py'
+
+DNN: `python dnn_classification.py'
+
+CNN: `python cnn_classification.py'
+
+
 # Part 2
 The outputs can be found here: https://drive.google.com/file/d/1h6SEr7DAYG2fhPsNZehrI8fc0Vwd7YCl/view?usp=sharing
 
